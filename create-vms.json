@@ -218,6 +218,10 @@
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmName'),copyIndex()))]"
       ],
+      "copy": {
+        "name": "initCopy",
+        "count": "[parameters('vmCount')]"
+      },
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
         "type": "CustomScript",
