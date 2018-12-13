@@ -9,6 +9,12 @@ The script also downloads
 
 Using these tools, data can be download from Azure Blob Storage onto the /data stripe set of the VM. NOTE: To avoid egress charges and to have the best performance, the VMs and source storage account __must__ be in the same Azure region.
 
+Create VMs using the template and Azure CLI 2.0 and enter values for parameters vmCount, vmName, adminPassword, subnetID (you can edit other parameters in the template that have defaultValues)
+```
+az group create -n avloadserver -l YOUR_AZURE_REGION
+az group deployment create -g avloadserver --template-file create-vms.json
+```
+
 AzCopy v10 Example
 ```
 azcopy cp --recursive --include "*" "https://yourstorageaccount.blob.core.windows.net/yourcontainer?SAS_TOKEN"  /data/azcopy_v10
