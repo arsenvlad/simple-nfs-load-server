@@ -60,6 +60,7 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "nicName": "[concat(parameters('vmName'),'-nic')]",
+    "nsgName": "[concat(parameters('vmName'),'-nsg')]",
     "storageAccountType": "Premium_LRS",
     "publicIPAddressName": "[concat(parameters('vmName'),'-publicip')]",
     "publicIPAddressType": "Dynamic",
@@ -68,6 +69,30 @@
     "diagnosticsStorageAccount": "[concat('d',uniqueString(resourceGroup().id,'d'))]"
   },
   "resources": [
+    {
+      "apiVersion": "2018-04-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_SSH",
+            "properties": {
+              "description": "Allow SSH access",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
     {
       "apiVersion": "2017-06-01",
       "type": "Microsoft.Storage/storageAccounts",
@@ -128,6 +153,9 @@
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('publicIPAddressName'),copyIndex()))]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
               },
               "subnet": {
                 "id": "[variables('subnetRef')]"
@@ -233,8 +261,7 @@
           ],
           "commandToExecute": "bash init.sh"
         },
-        "protectedSettings": {
-        }
+        "protectedSettings": {}
       }
     }
   ],
